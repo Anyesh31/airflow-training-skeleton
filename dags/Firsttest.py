@@ -25,5 +25,5 @@ pgsl_to_gcs= PostgresToGoogleCloudStorageOperator
     bucket="airflow-training-knab-asv",
     filename="land_registry_price_paid_uk/{{ds}}/proerties_{}.json",
     postgre_conn_id="airflow-training-postgres"
-    )
 )
+
