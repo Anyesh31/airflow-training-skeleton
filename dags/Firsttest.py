@@ -23,7 +23,7 @@ pgsl_to_gcs= PostgresToGoogleCloudStorageOperator
     dag=dag,
     sql="select * from land_registry_price_paid_uk where trnasfer_date='{{ds}}'",
     bucket="airflow-training-knab-asv",
-    filename="land_registry_price_paid_uk/{{ds}}/proerties_{}.json",
+    filename="land_registry_price_paid_uk/{{ds}}/properties_{}.json",
     postgre_conn_id="airflow-training-postgres"
     )
 )
