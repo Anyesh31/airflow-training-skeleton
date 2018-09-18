@@ -17,13 +17,12 @@ dag = DAG(
 )
 
 
-pgsl_to_gcs = PostgresToGoogleCloudStorageOperator
-(
+pgsl_to_gcs = PostgresToGoogleCloudStorageOperator(
     task_id="postgres_to_gcs",
     dag=dag,
     sql="select * from land_registry_price_paid_uk where trnasfer_date='{{ds}}'",
     bucket="airflow-training-knab-asv",
     filename="land_registry_price_paid_uk/{{ds}}/proerties_{}.json",
-    postgre_conn_id="airflow-training-postgres"
+    postgres_conn_id="airflow-training-postgres"
 )
 
