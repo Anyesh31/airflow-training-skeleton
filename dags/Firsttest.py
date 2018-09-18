@@ -17,7 +17,7 @@ dag = DAG(
 )
 
 
-pgsl_to_gcs= PostgresToGoogleCloudStorageOperator
+pgsl_to_gcs = PostgresToGoogleCloudStorageOperator
 (
     task_id="postgres_to_gcs",
     dag=dag,
