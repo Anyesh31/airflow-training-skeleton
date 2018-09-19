@@ -50,10 +50,10 @@ dataproc_create_cluster = DataprocClusterCreateOperator(
 land_registry_prices_to_bigquery = DataFlowPythonOperator(
     task_id="land_registry_prices_to_bigquery",
     dataflow_default_options={
-        "project": "gdd-airflow-training",
+        "project": "gdd-990fd90d0db6efbabdc6b70f1c",
         "region": "europe-west1",
     },
-    py_file="gs://europe-west1-airflow-traini-627000e4-bucket/other/dataflow_job.py",
+    py_file="gs://airflow-training-knab-asv/dataflow_job.py",
     dag=dag,
 )
 
