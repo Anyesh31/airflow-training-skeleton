@@ -47,6 +47,16 @@ dataproc_create_cluster = DataprocClusterCreateOperator(
     dag=dag,
 )
 
+land_registry_prices_to_bigquery = DataFlowPythonOperator(
+    task_id="land_registry_prices_to_bigquery",
+    dataflow_default_options={
+        "project": "gdd-airflow-training",
+        "region": "europe-west1",
+    },
+    py_file="gs://europe-west1-airflow-traini-627000e4-bucket/other/dataflow_job.py",
+    dag=dag,
+)
+
 for currency in {'EUR', 'USD'}:
     currency_task = HttpToGcsOperator(
         task_id="get_currency_" + currency,
@@ -76,16 +86,6 @@ dataproc_delete_cluster = DataprocClusterDeleteOperator(
 )
 
 pgsl_to_gcs >> dataproc_create_cluster >> compute_aggregates >> dataproc_delete_cluster
-
-land_registry_prices_to_bigquery = DataFlowPythonOperator(
-    task_id="land_registry_prices_to_bigquery",
-    dataflow_default_options={
-        "project": "gdd-airflow-training",
-        "region": "europe-west1",
-    },
-    py_file="gs://europe-west1-airflow-traini-627000e4-bucket/other/dataflow_job.py",
-    dag=dag,
-)
 
 pgsl_to_gcs >> dataproc_create_cluster >> land_registry_prices_to_bigquery
 
