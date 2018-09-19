@@ -46,7 +46,7 @@ dataproc_create_cluster = DataprocClusterCreateOperator(
 pgsl_to_gcs >> dataproc_create_cluster
 
 for currency in {'EUR', 'USD'}:
-   Currency_task = HttpToGcsOperator(
+    Currency_task = HttpToGcsOperator(
         task_id="get_currency_" + currency,
         method="GET",
         endpoint="airflow-training-transform-valutas?date={{ ds }}&from=GBP&to=" + currency,
