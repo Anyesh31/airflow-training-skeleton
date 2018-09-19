@@ -10,7 +10,7 @@ from airflow.contrib.operators.dataproc_operator import (
 )
 from airflow.utils.trigger_rule import TriggerRule
 
-PROJECT_ID='gdd-990fd90d0db6efbabdc6b70f1c'
+PROJECT_ID = 'gdd-990fd90d0db6efbabdc6b70f1c'
 
 dag = DAG(
     dag_id="FirstScript",
@@ -51,7 +51,6 @@ dataproc_create_cluster = DataprocClusterCreateOperator(
     cluster_name="analyse-pricing-{{ ds }}",
     project_id=PROJECT_ID,
     num_workers=2,
-    zone="europe-west4-a",
     zone="europe-west4-a",
     dag=dag,
 )
