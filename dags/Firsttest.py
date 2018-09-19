@@ -14,7 +14,7 @@ from airflow.contrib.operators.dataflow_operator import DataFlowPythonOperator
 
 PROJECT_ID = 'gdd-990fd90d0db6efbabdc6b70f1c'
 
-BUCKET='airflow-training-knab-asv'
+BUCKET = 'airflow-training-knab-asv'
 
 dag = DAG(
     dag_id="FirstScript",
