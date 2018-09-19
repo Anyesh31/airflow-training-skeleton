@@ -57,7 +57,7 @@ for currency in {'EUR', 'USD'}:
         gcs_path="currency/{{ ds }}-" + currency + ".json",
         dag=dag,
     )
-    currency_task >> dataproc_create_cluster
+    currency_task >> dataproc_create_cluster >> land_registry_prices_to_bigquery
 
 compute_aggregates = DataProcPySparkOperator(
     task_id='compute_aggregates',
@@ -77,7 +77,7 @@ dataproc_delete_cluster = DataprocClusterDeleteOperator(
 
 pgsl_to_gcs >> dataproc_create_cluster >> compute_aggregates >> dataproc_delete_cluster
 
-DataFlowPythonOperator(
+land_registry_prices_to_bigquery = DataFlowPythonOperator(
     task_id="land_registry_prices_to_bigquery",
     dataflow_default_options={
         "project": "gdd-airflow-training",
@@ -87,7 +87,9 @@ DataFlowPythonOperator(
     dag=dag,
 )
 
-GoogleCloudStorageToBigQueryOperator(
+pgsl_to_gcs >> dataproc_create_cluster >> land_registry_prices_to_bigquery
+
+write_to_bq = GoogleCloudStorageToBigQueryOperator(
     task_id="write_to_bq",
     bucket=BUCKET,
     source_objects=["average_prices/transfer_date={{ ds }}/*"],
@@ -96,3 +98,5 @@ GoogleCloudStorageToBigQueryOperator(
     write_disposition="WRITE_TRUNCATE",
     dag=dag,
 )
+
+pgsl_to_gcs >> dataproc_create_cluster >> compute_aggregates >> write_to_bq
