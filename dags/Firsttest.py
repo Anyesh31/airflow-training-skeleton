@@ -43,10 +43,10 @@ dataproc_create_cluster = DataprocClusterCreateOperator(
     dag=dag,
 )
 
-pgsl_to_gcs >> dataproc_create_cluster
+
 
 for currency in {'EUR', 'USD'}:
-    Currency_task = HttpToGcsOperator(
+    currency_task = HttpToGcsOperator(
         task_id="get_currency_" + currency,
         method="GET",
         endpoint="airflow-training-transform-valutas?date={{ ds }}&from=GBP&to=" + currency,
@@ -55,7 +55,7 @@ for currency in {'EUR', 'USD'}:
         gcs_path="currency/{{ ds }}-" + currency + ".json",
         dag=dag,
     )
-    Currency_task >> dataproc_create_cluster
+    currency_task >> dataproc_create_cluster
 
 
 compute_aggregates = DataProcPySparkOperator(
@@ -74,5 +74,5 @@ dataproc_delete_cluster = DataprocClusterDeleteOperator(
     trigger_rule=TriggerRule.ALL_DONE,
 )
 
-
+pgsl_to_gcs >> dataproc_create_cluster >> compute_aggregates >> dataproc_delete_cluster
 
