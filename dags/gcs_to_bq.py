@@ -198,8 +198,8 @@ class GoogleCloudStorageToBigQueryOperator(BaseOperator):
         )
 
         if (
-            not self.schema_fields
-            and self.schema_object
+            not self.schema_fields 
+            and self.schema_object 
             and self.source_format != "DATASTORE_BACKUP"
         ):
             gcs_hook = GoogleCloudStorageHook(
