@@ -43,8 +43,6 @@ dataproc_create_cluster = DataprocClusterCreateOperator(
     dag=dag,
 )
 
-
-
 for currency in {'EUR', 'USD'}:
     currency_task = HttpToGcsOperator(
         task_id="get_currency_" + currency,
@@ -56,7 +54,6 @@ for currency in {'EUR', 'USD'}:
         dag=dag,
     )
     currency_task >> dataproc_create_cluster
-
 
 compute_aggregates = DataProcPySparkOperator(
     task_id='compute_aggregates',
