@@ -9,8 +9,12 @@ from airflow.contrib.operators.dataproc_operator import (
     DataProcPySparkOperator
 )
 from airflow.utils.trigger_rule import TriggerRule
+from godatadriven.operators.gcs_to_bq import GoogleCloudStorageToBigQueryOperator
+from airflow.contrib.operators.dataflow_operator import DataFlowPythonOperator
 
 PROJECT_ID = 'gdd-990fd90d0db6efbabdc6b70f1c'
+
+BUCKET='airflow-training-knab-asv'
 
 dag = DAG(
     dag_id="FirstScript",
@@ -73,3 +77,22 @@ dataproc_delete_cluster = DataprocClusterDeleteOperator(
 
 pgsl_to_gcs >> dataproc_create_cluster >> compute_aggregates >> dataproc_delete_cluster
 
+DataFlowPythonOperator(
+    task_id="land_registry_prices_to_bigquery",
+    dataflow_default_options={
+        "project": "gdd-airflow-training",
+        "region": "europe-west1",
+    },
+    py_file="gs://europe-west1-airflow-traini-627000e4-bucket/other/dataflow_job.py",
+    dag=dag,
+)
+
+GoogleCloudStorageToBigQueryOperator(
+    task_id="write_to_bq",
+    bucket=BUCKET,
+    source_objects=["average_prices/transfer_date={{ ds }}/*"],
+    destination_project_dataset_table="gd-airflow-training:prices.land_registry_prices${{ ds_nodash }}",
+    source_format="PARQUET",
+    write_disposition="WRITE_TRUNCATE",
+    dag=dag,
+)
