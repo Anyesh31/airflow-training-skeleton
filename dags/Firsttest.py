@@ -67,7 +67,7 @@ for currency in {'EUR', 'USD'}:
         gcs_path="currency/{{ ds }}-" + currency + ".json",
         dag=dag,
     )
-    currency_task >> dataproc_create_cluster >> land_registry_prices_to_bigquery
+    currency_task >> dataproc_create_cluster 
 
 compute_aggregates = DataProcPySparkOperator(
     task_id='compute_aggregates',
@@ -85,9 +85,14 @@ dataproc_delete_cluster = DataprocClusterDeleteOperator(
     trigger_rule=TriggerRule.ALL_DONE,
 )
 
-pgsl_to_gcs >> dataproc_create_cluster >> compute_aggregates >> dataproc_delete_cluster
+pgsl_to_gcs >> dataproc_create_cluster 
 
-pgsl_to_gcs >> dataproc_create_cluster >> land_registry_prices_to_bigquery
+dataproc_create_cluster >> compute_aggregates
+
+dataproc_create_cluster >> land_registry_prices_to_bigquery
+
+compute_aggregates >> dataproc_delete_cluster
+
 
 write_to_bq = GoogleCloudStorageToBigQueryOperator(
     task_id="write_to_bq",
@@ -99,4 +104,4 @@ write_to_bq = GoogleCloudStorageToBigQueryOperator(
     dag=dag,
 )
 
-pgsl_to_gcs >> dataproc_create_cluster >> compute_aggregates >> write_to_bq
+compute_aggregates >> write_to_bq
