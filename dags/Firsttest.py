@@ -34,8 +34,19 @@ pgsl_to_gcs = PostgresToGoogleCloudStorageOperator(
     postgres_conn_id="airflow-training-postgres"
 )
 
+dataproc_create_cluster = DataprocClusterCreateOperator(
+    task_id="create_dataproc",
+    cluster_name="analyse-pricing-{{ ds }}",
+    project_id=PROJECT_ID,
+    num_workers=2,
+    zone="europe-west4-a",
+    dag=dag,
+)
+
+pgsl_to_gcs >> dataproc_create_cluster
+
 for currency in {'EUR', 'USD'}:
-    HttpToGcsOperator(
+   Currency_task = HttpToGcsOperator(
         task_id="get_currency_" + currency,
         method="GET",
         endpoint="airflow-training-transform-valutas?date={{ ds }}&from=GBP&to=" + currency,
@@ -45,15 +56,7 @@ for currency in {'EUR', 'USD'}:
         dag=dag,
     )
 
-
-dataproc_create_cluster = DataprocClusterCreateOperator(
-    task_id="create_dataproc",
-    cluster_name="analyse-pricing-{{ ds }}",
-    project_id=PROJECT_ID,
-    num_workers=2,
-    zone="europe-west4-a",
-    dag=dag,
-)
+Currency_task >> dataproc_create_cluster
 
 compute_aggregates = DataProcPySparkOperator(
     task_id='compute_aggregates',
@@ -70,3 +73,6 @@ dataproc_delete_cluster = DataprocClusterDeleteOperator(
     project_id=PROJECT_ID,
     trigger_rule=TriggerRule.ALL_DONE,
 )
+
+
+
