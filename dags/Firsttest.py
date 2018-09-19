@@ -67,7 +67,7 @@ for currency in {'EUR', 'USD'}:
         gcs_path="currency/{{ ds }}-" + currency + ".json",
         dag=dag,
     )
-    currency_task >> dataproc_create_cluster 
+    currency_task >> dataproc_create_cluster
 
 compute_aggregates = DataProcPySparkOperator(
     task_id='compute_aggregates',
@@ -85,7 +85,7 @@ dataproc_delete_cluster = DataprocClusterDeleteOperator(
     trigger_rule=TriggerRule.ALL_DONE,
 )
 
-pgsl_to_gcs >> dataproc_create_cluster 
+pgsl_to_gcs >> dataproc_create_cluster
 
 dataproc_create_cluster >> compute_aggregates
 
